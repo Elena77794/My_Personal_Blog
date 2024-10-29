@@ -19,7 +19,7 @@ def show_post(request, post_id):
             data = {"body": item["body"],
                     "title": item["title"],
                     "subtitle": item["subtitle"]}
-    return render(request, "posts/index.html", data)
+    return render(request, "posts/post.html", data)
 
 
 def about_page(request):
