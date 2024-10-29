@@ -2,12 +2,13 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 import requests
+from .models import BlogPost
 
 
 # Create your views here.
 def home(request):
-    response = requests.get('https://api.npoint.io/c790b4d5cab58020d391').json()
-    data = {"posts": response
+    posts = BlogPost.objects.all()
+    data = {"posts": posts
             }
     return render(request, "posts/index.html", data)
 
