@@ -1,7 +1,8 @@
+from django.contrib.auth import login
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-
+from .forms import UserRegistrationForm
 import requests
 
 from .forms import CreatePostForm
@@ -67,3 +68,19 @@ def delete_post(request, post_id):
         post.delete()  # Delete the post
         return redirect('home')  # Redirect to a suitable page after deletion
     return render(request, "posts/index.html")
+
+
+def register_page(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)  # Create the user instance but don't save to DB yet
+            user.set_password(form.cleaned_data['password'])  # Hash the password
+            user.save()  # Now save the user to the database
+
+            # Automatically log in the user after registration
+            login(request, user)
+            return redirect('home')  # Change 'home' to your home page
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'posts/register.html', {'form': form})
