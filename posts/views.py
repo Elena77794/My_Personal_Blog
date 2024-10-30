@@ -17,10 +17,7 @@ def home(request):
 
 def show_post(request, post_id):
     post = get_object_or_404(BlogPost, id=post_id)
-    data = {'title': post.title,
-            'subtitle': post.subtitle,
-            'body': post.body
-            }
+    data = {'post': post}
     return render(request, "posts/post.html", data)
 
 
@@ -48,3 +45,16 @@ def create_post(request):
     else:
         form = CreatePostForm()
     return render(request, "posts/make-post.html", {'form': form})
+
+
+def edit_post(request, post_id):
+    post = get_object_or_404(BlogPost, id=post_id)
+    if request.method == "POST":
+        edit_form = CreatePostForm(request.POST, instance=post)  # Populate the form with post data
+        if edit_form.is_valid():
+            edit_form.save()  # Save the updated post
+            return redirect('post', post_id=post.id)
+    else:
+        edit_form = CreatePostForm(instance=post)  # Pre-fill the form with current post data
+    data = {"form": edit_form}
+    return render(request, "posts/make-post.html", data)
