@@ -25,8 +25,12 @@
                         </a>
                         <p class="post-meta">
                             Posted by
-                            <a href="#!">{{post.author}}</a>
+                            <a href="" >{{post.author}} </a>
                             {{post.date}}
+                             <form action="{% url 'delete_post' post.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                 <button type="submit" style="border: none; background: none; color: red; cursor: pointer;">✘ Click To Delete Post</button>
+                             </form>
                         </p>
                     </div>
                     {% endfor %}

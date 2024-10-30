@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -58,3 +59,11 @@ def edit_post(request, post_id):
         edit_form = CreatePostForm(instance=post)  # Pre-fill the form with current post data
     data = {"form": edit_form}
     return render(request, "posts/make-post.html", data)
+
+
+def delete_post(request, post_id):
+    post = get_object_or_404(BlogPost, id=post_id) # Retrieve the post to be deleted
+    if request.method == "POST":  # Ensure it's a POST request                        # Ensure this block runs in a transaction
+        post.delete()  # Delete the post
+        return redirect('home')  # Redirect to a suitable page after deletion
+    return render(request, "posts/index.html")
