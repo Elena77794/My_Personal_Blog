@@ -1,7 +1,9 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 
 import requests
+
+from .forms import CreatePostForm
 from .models import BlogPost
 
 
@@ -14,12 +16,11 @@ def home(request):
 
 
 def show_post(request, post_id):
-    response = requests.get('https://api.npoint.io/c790b4d5cab58020d391').json()
-    for item in response:
-        if item["id"] == post_id:
-            data = {"body": item["body"],
-                    "title": item["title"],
-                    "subtitle": item["subtitle"]}
+    post = get_object_or_404(BlogPost, id=post_id)
+    data = {'title': post.title,
+            'subtitle': post.subtitle,
+            'body': post.body
+            }
     return render(request, "posts/post.html", data)
 
 
@@ -34,5 +35,16 @@ def contact_page(request):
         phone_number = request.POST.get('phone')
         message = request.POST.get('message')
         print(f"Come from {name}, mail_box {email}, phone_number: {phone_number} with message {message}")
-        return  HttpResponse("Succesfully sent your message")
+        return HttpResponse("Succesfully sent your message")
     return render(request, "posts/contact.html")
+
+
+def create_post(request):
+    if request.method == 'POST':
+        form = CreatePostForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = CreatePostForm()
+    return render(request, "posts/make-post.html", {'form': form})
