@@ -9,14 +9,14 @@ from ckeditor.fields import RichTextField
 from django.db import models
 
 
-class BlogPost(models.Model):
+class Post(models.Model):
     title = models.CharField(max_length=100)
     date = models.DateField(auto_now_add=True)
     body = models.TextField(max_length=1000)
     author = models.CharField(max_length=255)
     img_url = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=500)
-    body = RichTextField()
+
 
     class Meta:
         managed = False

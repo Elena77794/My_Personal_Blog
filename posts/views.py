@@ -6,19 +6,19 @@ from .forms import UserRegistrationForm, UserLoginForm
 import requests
 
 from .forms import CreatePostForm
-from .models import BlogPost
+from .models import Post
 
 
 
 def home(request):
-    posts = BlogPost.objects.all()
+    posts = Post.objects.all()
     data = {"posts": posts
             }
     return render(request, "posts/index.html", data)
 
 
 def show_post(request, post_id):
-    post = get_object_or_404(BlogPost, id=post_id)
+    post = get_object_or_404 (Post, id=post_id)
     data = {'post': post}
     return render(request, "posts/post.html", data)
 
@@ -50,7 +50,7 @@ def create_post(request):
 
 
 def edit_post(request, post_id):
-    post = get_object_or_404(BlogPost, id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     if request.method == "POST":
         edit_form = CreatePostForm(request.POST, instance=post)
         if edit_form.is_valid():
@@ -63,7 +63,7 @@ def edit_post(request, post_id):
 
 
 def delete_post(request, post_id):
-    post = get_object_or_404(BlogPost, id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     if request.method == "POST":
         post.delete()
         return redirect('home')

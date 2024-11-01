@@ -1,15 +1,14 @@
 from django import forms
 from ckeditor.fields import RichTextFormField
-from .models import BlogPost
+from .models import Post
 from django.contrib.auth.models import User
 
 
 class CreatePostForm(forms.ModelForm):
     class Meta:
-        model = BlogPost
+        model = Post
         fields = ['title', 'subtitle', 'author', 'img_url', 'body']
 
-    body = RichTextFormField()
 
 
 class UserRegistrationForm(forms.ModelForm):
