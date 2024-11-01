@@ -1,5 +1,5 @@
 from django import forms
-from ckeditor.fields import RichTextFormField  # Import CKEditor form field
+from ckeditor.fields import RichTextFormField
 from .models import BlogPost
 from django.contrib.auth.models import User
 
@@ -9,11 +9,17 @@ class CreatePostForm(forms.ModelForm):
         model = BlogPost
         fields = ['title', 'subtitle', 'author', 'img_url', 'body']
 
-    body = RichTextFormField()  # Assign CKEditor to the 'body' field
+    body = RichTextFormField()
 
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+
+class UserLoginForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={'placeholder': 'Username'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), required=True)

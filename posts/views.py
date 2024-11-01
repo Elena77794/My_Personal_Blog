@@ -1,15 +1,15 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserLoginForm
 import requests
 
 from .forms import CreatePostForm
 from .models import BlogPost
 
 
-# Create your views here.
+
 def home(request):
     posts = BlogPost.objects.all()
     data = {"posts": posts
@@ -52,37 +52,54 @@ def create_post(request):
 def edit_post(request, post_id):
     post = get_object_or_404(BlogPost, id=post_id)
     if request.method == "POST":
-        edit_form = CreatePostForm(request.POST, instance=post)  # Populate the form with post data
+        edit_form = CreatePostForm(request.POST, instance=post)
         if edit_form.is_valid():
             edit_form.save()  # Save the updated post
             return redirect('post', post_id=post.id)
     else:
-        edit_form = CreatePostForm(instance=post)  # Pre-fill the form with current post data
+        edit_form = CreatePostForm(instance=post)
     data = {"form": edit_form}
     return render(request, "posts/make-post.html", data)
 
 
 def delete_post(request, post_id):
-    post = get_object_or_404(BlogPost, id=post_id) # Retrieve the post to be deleted
-    if request.method == "POST":  # Ensure it's a POST request                        # Ensure this block runs in a transaction
-        post.delete()  # Delete the post
-        return redirect('home')  # Redirect to a suitable page after deletion
+    post = get_object_or_404(BlogPost, id=post_id)
+    if request.method == "POST":
+        post.delete()
+        return redirect('home')
     return render(request, "posts/index.html")
 
 
-def register_page(request):
+def register_user(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)  # Create the user instance but don't save to DB yet
-            user.set_password(form.cleaned_data['password'])  # Hash the password
-            user.save()  # Now save the user to the database
-
-            # Automatically log in the user after registration
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
             login(request, user)
-            return redirect('home')  # Change 'home' to your home page
+            return redirect('home')
     else:
         form = UserRegistrationForm()
     return render(request, 'posts/register.html', {'form': form})
+
+
+def login_user(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+    else:
+        form = UserLoginForm()
+    return render(request, 'posts/login.html', {'form': form})
+
+
+
+
 
 
