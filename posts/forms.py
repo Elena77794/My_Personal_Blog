@@ -10,7 +10,6 @@ class CreatePostForm(forms.ModelForm):
         fields = ['title', 'subtitle', 'author', 'img_url', 'body']
 
 
-
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
 

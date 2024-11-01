@@ -9,7 +9,6 @@ from .forms import CreatePostForm
 from .models import Post
 
 
-
 def home(request):
     posts = Post.objects.all()
     data = {"posts": posts
@@ -18,7 +17,7 @@ def home(request):
 
 
 def show_post(request, post_id):
-    post = get_object_or_404 (Post, id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     data = {'post': post}
     return render(request, "posts/post.html", data)
 
@@ -97,9 +96,3 @@ def login_user(request):
     else:
         form = UserLoginForm()
     return render(request, 'posts/login.html', {'form': form})
-
-
-
-
-
-
