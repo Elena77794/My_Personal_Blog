@@ -12,15 +12,11 @@ from django.db import models
 class Post(models.Model):
     title = models.CharField(max_length=100)
     date = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
     body = models.TextField(max_length=1000)
     author = models.CharField(max_length=255)
     img_url = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=500)
 
-
     class Meta:
-        managed = False
         db_table = 'blog_post'
-
-
-
