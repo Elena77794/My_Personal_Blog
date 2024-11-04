@@ -1,4 +1,5 @@
 from datetime import timezone
+from django.contrib.auth.models import User
 
 import self as self
 from django.contrib.auth import login, authenticate
@@ -8,58 +9,86 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, FormView, DeleteView, CreateView
 from django.forms import model_to_dict
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from .forms import UserRegistrationForm, UserLoginForm
 import requests
 
 from .forms import CreatePostForm
 from .models import Post
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import PostSerializer
 
 
-class PostAPIView(APIView):
-    def get(self, request):
-        posts = Post.objects.all()
-        return Response({'posts': PostSerializer(posts, many=True).data})
+class PostAPIList(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
-    def post(self, request):
-        serializer = PostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
 
-    def put(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
+class PostAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
 
-        try:
-            instance = Post.objects.get(pk=pk)
 
-        except:
-            return Response({"error": "Object does not exists"})
+#
+#
+class PostApiDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (IsAdminOrReadOnly, )
 
-        serializer = PostSerializer(data=request.data, instance=instance, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"post": serializer.data})
+# @action(methods=['get'], detail=False)
+# def all_users(self, request):
+#     users = User.objects.all()
+#     return Response({'users': [name.username for name in users]})
+#
 
-    def delete(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        if not pk:
-            return Response({"error": "Method DELETE not allowed"})
-
-        try:
-            instance = Post.objects.get(pk=pk)
-
-        except:
-            return Response({"error": "Object does not exists"})
-
-        instance.delete()
-        return Response({"message": "Post deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+# class PostAPIView(APIView):
+#     def get(self, request):
+#         posts = Post.objects.all()
+#         return Response({'posts': PostSerializer(posts, many=True).data})
+#
+#     def post(self, request):
+#         serializer = PostSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({'post': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get('pk', None)
+#         if not pk:
+#             return Response({"error": "Method PUT not allowed"})
+#
+#         try:
+#             instance = Post.objects.get(pk=pk)
+#
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         serializer = PostSerializer(data=request.data, instance=instance, partial=True)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"post": serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get('pk', None)
+#         if not pk:
+#             return Response({"error": "Method DELETE not allowed"})
+#
+#         try:
+#             instance = Post.objects.get(pk=pk)
+#
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         instance.delete()
+#         return Response({"message": "Post deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class BlogHome(ListView):
@@ -78,7 +107,9 @@ class CreatePost(FormView):
     success_url = reverse_lazy('home')
 
     def form_valid(self, form):
-        form.save()
+        post = form.save(commit=False)
+        post.user = self.request.user
+        post.save()
         return super().form_valid(form)
 
 

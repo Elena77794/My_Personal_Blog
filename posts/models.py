@@ -7,6 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from ckeditor.fields import RichTextField
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Post(models.Model):
@@ -17,6 +18,7 @@ class Post(models.Model):
     author = models.CharField(max_length=255)
     img_url = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=500)
+    user = models.ForeignKey(User,  verbose_name="Users", on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'blog_post'
