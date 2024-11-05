@@ -122,8 +122,6 @@ REST_FRAMEWORK ={'DEFAULT_RENDERER_CLASSES':  [
 }
 
 
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

@@ -9,21 +9,14 @@ from .models import Post
 
 
 class PostSerializer(serializers.ModelSerializer):
-<<<<<<< HEAD
+
     user = serializers.HiddenField(default=serializers.CurrentUserDefault)
 
     class Meta:
         model = Post
         fields = "__all__"
 
-=======
-    class Meta:
-        model = Post
-        fields = "__all__"
 
-
-
->>>>>>> 0601ef10fea95110d0d4ce56ba2872af43c28785
 # class PostSerializer(serializers.Serializer):
 #     title = serializers.CharField(max_length=255)
 #     body = serializers.CharField(max_length=1000)

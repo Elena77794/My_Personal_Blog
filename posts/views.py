@@ -24,25 +24,23 @@ from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import PostSerializer
 
 
-<<<<<<< HEAD
 class PostAPIList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class PostAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsOwnerOrReadOnly, )
+    permission_classes = (IsOwnerOrReadOnly,)
 
 
-#
-#
 class PostApiDestroy(generics.RetrieveDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly,)
+
 
 # @action(methods=['get'], detail=False)
 # def all_users(self, request):
@@ -50,7 +48,6 @@ class PostApiDestroy(generics.RetrieveDestroyAPIView):
 #     return Response({'users': [name.username for name in users]})
 #
 
-=======
 # class PostAPIList(generics.ListCreateAPIView):
 #     queryset = Post.objects.all()
 #     serializer_class = PostSerializer
@@ -65,17 +62,17 @@ class PostApiDestroy(generics.RetrieveDestroyAPIView):
 #     queryset = Post.objects.all()
 #     serializer_class = PostSerializer
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+# class PostViewSet(viewsets.ModelViewSet):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#
+#     # @action(methods=['get'], detail=False)
+#     # def all_users(self, request):
+#     #     users = User.objects.all()
+#     #     return Response({'users': [name.username for name in users]})
+#     #
 
-    # @action(methods=['get'], detail=False)
-    # def all_users(self, request):
-    #     users = User.objects.all()
-    #     return Response({'users': [name.username for name in users]})
-    #
 
->>>>>>> 0601ef10fea95110d0d4ce56ba2872af43c28785
 # class PostAPIView(APIView):
 #     def get(self, request):
 #         posts = Post.objects.all()
