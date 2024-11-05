@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, FormView, DeleteView, CreateView
 from django.forms import model_to_dict
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -24,10 +25,17 @@ from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import PostSerializer
 
 
+class PostAPIListPagination(PageNumberPagination):
+    page_size = 3
+    page_query_param = 'page_size'
+    max_page_size = 10000
+
+
 class PostAPIList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = PostAPIListPagination
 
 
 class PostAPIUpdate(generics.RetrieveUpdateAPIView):
