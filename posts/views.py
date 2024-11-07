@@ -31,12 +31,25 @@ class PostAPIListPagination(PageNumberPagination):
     max_page_size = 10000
 
 
-class PostAPIList(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+class PostAPIList(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PostAPIListPagination
 
+    def get(self, request):
+        queryset = Post.objects.all()
+        return Response({'posts': PostSerializer(queryset, many=True).data})
+
+    def post(self, request):
+        user_instance = request.user
+        post_new = Post.objects.create(
+            title=request.data["title"],
+            body=request.data["author"],
+            img_url=request.data["img_url"],
+            subtitle=request.data["subtitle"],
+            user=user_instance
+
+        )
+        return Response({"post": PostSerializer(post_new).data})
 
 class PostAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
@@ -48,79 +61,6 @@ class PostApiDestroy(generics.RetrieveDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAdminOrReadOnly,)
-
-
-# @action(methods=['get'], detail=False)
-# def all_users(self, request):
-#     users = User.objects.all()
-#     return Response({'users': [name.username for name in users]})
-#
-
-# class PostAPIList(generics.ListCreateAPIView):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#
-#
-# class PostAPIUpdate(generics.UpdateAPIView):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#
-#
-# class PostApiDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-
-# class PostViewSet(viewsets.ModelViewSet):
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#
-#     # @action(methods=['get'], detail=False)
-#     # def all_users(self, request):
-#     #     users = User.objects.all()
-#     #     return Response({'users': [name.username for name in users]})
-#     #
-
-
-# class PostAPIView(APIView):
-#     def get(self, request):
-#         posts = Post.objects.all()
-#         return Response({'posts': PostSerializer(posts, many=True).data})
-#
-#     def post(self, request):
-#         serializer = PostSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({'post': serializer.data})
-#
-#     def put(self, request, *args, **kwargs):
-#         pk = kwargs.get('pk', None)
-#         if not pk:
-#             return Response({"error": "Method PUT not allowed"})
-#
-#         try:
-#             instance = Post.objects.get(pk=pk)
-#
-#         except:
-#             return Response({"error": "Object does not exists"})
-#
-#         serializer = PostSerializer(data=request.data, instance=instance, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({"post": serializer.data})
-#
-#     def delete(self, request, *args, **kwargs):
-#         pk = kwargs.get('pk', None)
-#         if not pk:
-#             return Response({"error": "Method DELETE not allowed"})
-#
-#         try:
-#             instance = Post.objects.get(pk=pk)
-#
-#         except:
-#             return Response({"error": "Object does not exists"})
-#
-#         instance.delete()
-#         return Response({"message": "Post deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class BlogHome(ListView):
