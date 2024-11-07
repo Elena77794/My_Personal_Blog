@@ -40,6 +40,8 @@ class PostAPIList(APIView):
         return Response({'posts': PostSerializer(queryset, many=True).data})
 
     def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         user_instance = request.user
         post_new = Post.objects.create(
             title=request.data["title"],
@@ -51,16 +53,55 @@ class PostAPIList(APIView):
         )
         return Response({"post": PostSerializer(post_new).data})
 
+
 class PostAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsOwnerOrReadOnly,)
 
+    def update(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"eroor": "Method PUT not allowed"})
 
-class PostApiDestroy(generics.RetrieveDestroyAPIView):
+        try:
+            instance = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response({"error": "Object does not exists"})
+
+        serializer = PostSerializer(data=request.data, instance=instance, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"post": serializer.data})
+
+
+class PostApiDestroy(generics.DestroyAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
     permission_classes = (IsAdminOrReadOnly,)
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
+        try:
+            instance = Post.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exist"}, status=404)
+
+        serializer = PostSerializer(instance)
+        return Response(serializer.data, status=200)
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        try:
+            instance = Post.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+        serializer = PostSerializer(instance)
+        response_data = {
+            "message": "This post will be deleted",
+            "post": serializer.data
+        }
+        instance.delete()
+        return Response(response_data, status=204)
 
 
 class BlogHome(ListView):
