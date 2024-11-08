@@ -9,7 +9,6 @@ from .models import Post
 
 
 class PostSerializer(serializers.Serializer):
-
     title = serializers.CharField(max_length=255)
     body = serializers.CharField(max_length=1000)
     author = serializers.CharField(max_length=255)

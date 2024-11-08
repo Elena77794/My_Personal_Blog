@@ -54,54 +54,47 @@ class PostAPIList(APIView):
         return Response({"post": PostSerializer(post_new).data})
 
 
-class PostAPIUpdate(generics.RetrieveUpdateAPIView):
+class UpdateBlogApi(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = IsOwnerOrReadOnly
 
-    def update(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
         if not pk:
-            return Response({"eroor": "Method PUT not allowed"})
+            return Response({"error": "Method PUT not allowed"})
 
         try:
             instance = Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
+        except:
             return Response({"error": "Object does not exists"})
 
         serializer = PostSerializer(data=request.data, instance=instance, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"post": serializer.data})
+
+        return Response({"updated_data": serializer.data}, status=status.HTTP_200_OK)
 
 
-class PostApiDestroy(generics.DestroyAPIView):
+class DeletePostApi(generics.RetrieveDestroyAPIView):
     queryset = Post.objects.all()
-    permission_classes = (IsAdminOrReadOnly,)
-
-    def get(self, request, *args, **kwargs):
-        pk = kwargs.get("pk")
-        try:
-            instance = Post.objects.get(pk=pk)
-        except:
-            return Response({"error": "Object does not exist"}, status=404)
-
-        serializer = PostSerializer(instance)
-        return Response(serializer.data, status=200)
+    serializer_class = PostSerializer
+    permission_classes = IsOwnerOrReadOnly
 
     def delete(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
+        pk = kwargs.get("pk")
+        if not pk:
+            return Response({"error": "Method DELETE not allowed"})
+
         try:
             instance = Post.objects.get(pk=pk)
         except:
             return Response({"error": "Object does not exists"})
-        serializer = PostSerializer(instance)
-        response_data = {
-            "message": "This post will be deleted",
-            "post": serializer.data
-        }
+
+        serializer = PostSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
         instance.delete()
-        return Response(response_data, status=204)
+        return Response({"post deleted": serializer.data}, status=status.HTTP_200_OK)
 
 
 class BlogHome(ListView):

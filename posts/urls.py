@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from posts.views import PostAPIList, PostAPIUpdate, PostApiDestroy
+from posts.views import PostAPIList, UpdateBlogApi, DeletePostApi
 
 urlpatterns = [
     path('', views.BlogHome.as_view(), name='home'),
@@ -13,6 +13,6 @@ urlpatterns = [
     path('register/', views.RegisterUser.as_view(), name="register"),
     path('login/', views.LoginUser.as_view(), name="login"),
     path('api/v1/post/', PostAPIList.as_view()),
-    path('api/v1/post/<int:pk>/', PostAPIUpdate.as_view()),
-    path('api/v1/delete/<int:pk>/', PostApiDestroy.as_view()),
+    path('api/v1/post/<int:pk>/', UpdateBlogApi.as_view()),
+    path('api/v1/delete/<int:pk>/', DeletePostApi.as_view()),
 ]
